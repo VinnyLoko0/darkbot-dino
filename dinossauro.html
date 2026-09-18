@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZOOM ARCADE — DINO RUNNER</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#10161b;color:#edf1f3;font-family:Arial,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden}
+.card{width:min(92vw,560px);background:#11171c;border:1px solid #29343b;border-radius:28px;padding:28px;box-shadow:0 18px 50px #000b}
+.brand{font-size:12px;letter-spacing:4px;color:#ef5363;font-weight:800}.head{display:flex;justify-content:space-between;align-items:end;padding:4px 0 27px;border-bottom:1px solid #2b343a}.title{font-size:23px;font-weight:800;margin-top:4px}.stats{display:flex;gap:28px;text-align:right}.label{font-size:10px;letter-spacing:2px;color:#9ca5aa}.num{font-size:22px;font-weight:800;letter-spacing:2px}
+.game{height:285px;margin-top:28px;position:relative;overflow:hidden;border:1px solid #263139;border-radius:22px;background:linear-gradient(#1b2930,#11191e);touch-action:none}.cloud{position:absolute;width:35px;height:8px;border-radius:10px;background:#68747b;opacity:.65}.cloud:before,.cloud:after{content:"";position:absolute;background:#68747b;border-radius:50%}.cloud:before{width:16px;height:14px;left:6px;top:-7px}.cloud:after{width:13px;height:11px;left:20px;top:-4px}.c1{top:35px;left:7%}.c2{top:50px;left:28%}.c3{top:62px;left:50%}.c4{top:43px;left:72%}
+.ground{position:absolute;left:0;right:0;bottom:35px;border-bottom:2px dashed #465159}.dino{position:absolute;left:11%;bottom:38px;width:24px;height:30px;background:#f0f3f4;border-radius:3px}.dino:before{content:"";position:absolute;right:-7px;top:0;width:12px;height:12px;background:#f0f3f4}.dino:after{content:"";position:absolute;right:-4px;top:4px;width:6px;height:6px;background:#172026}
+.cactus{position:absolute;bottom:38px;left:85%;width:17px;height:28px;background:#e84e5c;border-radius:3px}.cactus:before{content:"";position:absolute;left:-5px;top:7px;width:27px;height:7px;background:#e84e5c;box-shadow:0 9px #e84e5c}.cactus:after{content:"";position:absolute;left:3px;top:-7px;width:6px;height:9px;background:#e84e5c;box-shadow:8px 0 #e84e5c}
+.hint{position:absolute;bottom:8px;width:100%;text-align:center;color:#59656d;font-size:9px;letter-spacing:1px}.footer{text-align:center;color:#9ca5aa;margin-top:24px;font-size:12px;letter-spacing:2px}button{width:100%;margin-top:17px;padding:12px;border:0;border-radius:12px;background:#263139;color:#fff;font-weight:700}
+</style>
+</head>
+<body>
+<main class="card">
+<div class="brand">ZOOM ARCADE</div>
+<div class="head"><div class="title">DINO RUNNER</div><div class="stats"><div><div class="label">PONTOS</div><div id="score" class="num">0000</div></div><div><div class="label">RECORDE</div><div id="best" class="num">0000</div></div></div></div>
+<div id="game" class="game"><i class="cloud c1"></i><i class="cloud c2"></i><i class="cloud c3"></i><i class="cloud c4"></i><div class="ground"></div><div id="dino" class="dino"></div><div id="cactus" class="cactus"></div><div class="hint">TOQUE NA TELA OU PRESSIONE ESPAÇO PARA PULAR</div></div>
+<div class="footer">BEST <span id="best2">0000</span> • VELOCIDADE <span id="speed">1.0x</span></div>
+<button id="again" hidden>JOGAR NOVAMENTE</button>
+</main>
+<script>
+const g=document.querySelector('#game'),d=document.querySelector('#dino'),c=document.querySelector('#cactus'),sc=document.querySelector('#score'),be=document.querySelector('#best'),be2=document.querySelector('#best2'),sp=document.querySelector('#speed'),again=document.querySelector('#again');
+let best=+localStorage.darkbotDinoBest||0,score=0,y=0,v=0,x=0,last=0,run=false;
+function showBest(){be.textContent=be2.textContent=String(best).padStart(4,'0')}showBest();
+function jump(){if(!run)return start();if(y===0)v=10}
+function start(){score=0;y=0;v=0;x=g.clientWidth+40;last=0;run=true;again.hidden=true;requestAnimationFrame(loop)}
+function loop(t){if(!run)return;if(!last)last=t;let dt=Math.min(2,(t-last)/16.67);last=t;score+=.18*dt;let speed=5+Math.min(score/45,5);y=Math.max(0,y+v*dt);if(y>0)v-=.65*dt;d.style.bottom=38+y+'px';x-=speed*dt;if(x<-35)x=g.clientWidth+70+Math.random()*150;c.style.left=x+'px';sc.textContent=String(Math.floor(score)).padStart(4,'0');sp.textContent=(speed/5).toFixed(1)+'x';let a=d.getBoundingClientRect(),b=c.getBoundingClientRect();if(a.right-5>b.left&&a.left+5<b.right&&a.bottom-5>b.top&&a.top+5<b.bottom)return gameOver();requestAnimationFrame(loop)}
+function gameOver(){run=false;last=0;let s=Math.floor(score);if(s>best){best=s;localStorage.darkbotDinoBest=best}showBest();again.hidden=false}
+g.addEventListener('pointerdown',e=>{e.preventDefault();jump()});document.addEventListener('keydown',e=>{if(e.code==='Space'||e.code==='ArrowUp'){e.preventDefault();jump()}});again.onclick=start;start();
+</script>
+</body>
+</html>
